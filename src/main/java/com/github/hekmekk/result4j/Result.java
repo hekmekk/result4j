@@ -29,12 +29,12 @@ public interface Result<T, E> extends Iterable<T>, Serializable {
 
   <U> Result<U, E> map(Function<? super T, ? extends U> f);
 
-  <F> Result<T, F> flatMapError(Function<? super E, ? extends Result<? extends T, ? extends F>> f);
-
-  <F> Result<T, F> mapError(Function<? super E, ? extends F> f);
+  <F extends E> Result<T, E> recoverWith(Function<F, ? extends Result<? extends T, E>> f);
 
   <F extends E> Result<T, E> recoverWith(
       Class<F> errorType, Function<F, ? extends Result<? extends T, E>> f);
+
+  <F extends E> Result<T, E> recover(Function<F, ? extends T> f);
 
   <F extends E> Result<T, E> recover(Class<F> errorType, Function<F, ? extends T> f);
 
@@ -97,21 +97,19 @@ public interface Result<T, E> extends Iterable<T>, Serializable {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public <F> Result<T, F> flatMapError(
-        final Function<? super E, ? extends Result<? extends T, ? extends F>> f) {
-      return (Result<T, F>) this;
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <F> Result<T, F> mapError(final Function<? super E, ? extends F> f) {
-      return (Result<T, F>) this;
+    public <F extends E> Result<T, E> recoverWith(
+        final Function<F, ? extends Result<? extends T, E>> f) {
+      return this;
     }
 
     @Override
     public <F extends E> Result<T, E> recoverWith(
         final Class<F> errorType, final Function<F, ? extends Result<? extends T, E>> f) {
+      return this;
+    }
+
+    @Override
+    public <F extends E> Result<T, E> recover(final Function<F, ? extends T> f) {
       return this;
     }
 
@@ -220,15 +218,10 @@ public interface Result<T, E> extends Iterable<T>, Serializable {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <F> Result<T, F> flatMapError(
-        final Function<? super E, ? extends Result<? extends T, ? extends F>> f) {
+    public <F extends E> Result<T, E> recoverWith(
+        final Function<F, ? extends Result<? extends T, E>> f) {
       Objects.requireNonNull(f, "f must not be null");
-      return (Result<T, F>) f.apply(error);
-    }
-
-    @Override
-    public <F> Result<T, F> mapError(final Function<? super E, ? extends F> f) {
-      return flatMapError(e -> Result.failure(f.apply(e)));
+      return (Result<T, E>) f.apply((F) error);
     }
 
     @Override
@@ -242,6 +235,12 @@ public interface Result<T, E> extends Iterable<T>, Serializable {
       }
 
       return this;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <F extends E> Result<T, E> recover(final Function<F, ? extends T> f) {
+      return recoverWith(e -> Result.success(f.apply((F) e)));
     }
 
     @Override

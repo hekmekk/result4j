@@ -75,23 +75,18 @@ class ResultTest {
   }
 
   @Test
-  void mapError() {
-    assertThrows(NullPointerException.class, () -> Result.failure(1).mapError(null));
-    assertThat(Result.failure(1).mapError(Function.identity()), is(Result.failure(1)));
-    assertThat(Result.failure(1).mapError(String::valueOf), is(Result.failure("1")));
-    assertThat(Result.success(1).mapError(Function.identity()), is(Result.success(1)));
-    assertThat(Result.success(1).mapError(String::valueOf), is(Result.success(1)));
-  }
-
-  @Test
   void recover() {
     final Result<Integer, String> success = Result.success(1);
     final Result<Integer, String> failure = Result.failure("FAILURE");
     assertThrows(NullPointerException.class, () -> failure.recover(null, String::length));
     assertThrows(NullPointerException.class, () -> failure.recover(String.class, null));
+    assertThrows(NullPointerException.class, () -> failure.recover(null));
     assertThat(success.recover(null, String::length), is(success));
+    assertThat(success.recover(null), is(success));
     assertThat(success.recover(String.class, null), is(success));
     assertThat(success.recover(String.class, String::length), is(success));
+
+    assertThat(Result.failure("FAILURE").recover(err -> 1), is(Result.success(1)));
 
     final Result<Integer, Throwable> recoverException =
         Result.<Integer, Throwable>failure(new IOException("FAILURE"))
@@ -108,10 +103,15 @@ class ResultTest {
     assertThrows(
         NullPointerException.class,
         () -> failure.recoverWith(null, str -> Result.success(str.length())));
+    assertThrows(NullPointerException.class, () -> failure.recoverWith(null));
     assertThrows(NullPointerException.class, () -> failure.recoverWith(String.class, null));
     assertThat(success.recoverWith(null, str -> Result.success(str.length())), is(success));
+    assertThat(success.recoverWith(null), is(success));
     assertThat(success.recoverWith(String.class, null), is(success));
     assertThat(success.recoverWith(String.class, str -> Result.success(str.length())), is(success));
+
+    assertThat(
+        Result.failure("FAILURE").recoverWith(err -> Result.success(1)), is(Result.success(1)));
 
     final Result<Integer, Throwable> recoverException =
         Result.<Integer, Throwable>failure(new IOException("FAILURE"))
@@ -130,17 +130,6 @@ class ResultTest {
     assertThat(success.flatMap(n -> Result.failure(23)), is(Result.failure(23)));
     assertThat(failure.flatMap(n -> Result.success(23)), is(failure));
     assertThat(failure.flatMap(n -> Result.failure(23)), is(failure));
-  }
-
-  @Test
-  void flatMapError() {
-    assertThrows(NullPointerException.class, () -> Result.failure(1).flatMapError(null));
-    final Result<Integer, Integer> success = Result.success(1);
-    final Result<Integer, Integer> failure = Result.failure(1);
-    assertThat(success.flatMapError(n -> Result.success(23)), is(success));
-    assertThat(success.flatMapError(n -> Result.failure(23)), is(success));
-    assertThat(failure.flatMapError(n -> Result.success(23)), is(Result.success(23)));
-    assertThat(failure.flatMapError(n -> Result.failure(23)), is(Result.failure(23)));
   }
 
   @Test
