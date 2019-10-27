@@ -75,9 +75,8 @@ public interface Result<T, E> extends Iterable<T>, Serializable {
 
     @Override
     public boolean equals(final Object obj) {
-      if (obj == this) return true;
-      if (!(obj instanceof Success)) return false;
-      return Objects.equals(value, ((Success) obj).value);
+      return (obj == this)
+          || (obj instanceof Success) && Objects.equals(value, ((Success) obj).value);
     }
 
     @Override
@@ -198,9 +197,8 @@ public interface Result<T, E> extends Iterable<T>, Serializable {
 
     @Override
     public boolean equals(final Object obj) {
-      if (obj == this) return true;
-      if (!(obj instanceof Failure)) return false;
-      return Objects.equals(error, ((Failure) obj).error);
+      return (obj == this)
+          || (obj instanceof Failure) && Objects.equals(error, ((Failure) obj).error);
     }
 
     @Override
