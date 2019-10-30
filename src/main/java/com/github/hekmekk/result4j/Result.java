@@ -32,11 +32,11 @@ public interface Result<V, E> extends Iterable<V>, Serializable {
   <F extends E> Result<V, E> recoverWith(Function<F, ? extends Result<? extends V, E>> f);
 
   <F extends E> Result<V, E> recoverWith(
-      Class<F> errorVype, Function<F, ? extends Result<? extends V, E>> f);
+      Class<F> errorType, Function<F, ? extends Result<? extends V, E>> f);
 
   <F extends E> Result<V, E> recover(Function<F, ? extends V> f);
 
-  <F extends E> Result<V, E> recover(Class<F> errorVype, Function<F, ? extends V> f);
+  <F extends E> Result<V, E> recover(Class<F> errorType, Function<F, ? extends V> f);
 
   <U> U fold(Function<? super V, ? extends U> f, Function<? super E, ? extends U> g);
 
@@ -106,7 +106,7 @@ public interface Result<V, E> extends Iterable<V>, Serializable {
 
     @Override
     public <F extends E> Result<V, E> recoverWith(
-        final Class<F> errorVype, final Function<F, ? extends Result<? extends V, E>> f) {
+        final Class<F> errorType, final Function<F, ? extends Result<? extends V, E>> f) {
       return this;
     }
 
@@ -117,7 +117,7 @@ public interface Result<V, E> extends Iterable<V>, Serializable {
 
     @Override
     public <F extends E> Result<V, E> recover(
-        final Class<F> errorVype, final Function<F, ? extends V> f) {
+        final Class<F> errorType, final Function<F, ? extends V> f) {
       return this;
     }
 
@@ -234,10 +234,10 @@ public interface Result<V, E> extends Iterable<V>, Serializable {
     @Override
     @SuppressWarnings("unchecked")
     public <F extends E> Result<V, E> recoverWith(
-        final Class<F> errorVype, final Function<F, ? extends Result<? extends V, E>> f) {
-      Objects.requireNonNull(errorVype, "errorClazz must not be null");
+        final Class<F> errorType, final Function<F, ? extends Result<? extends V, E>> f) {
+      Objects.requireNonNull(errorType, "errorClazz must not be null");
       Objects.requireNonNull(f, "f must not be null");
-      if (errorVype.isAssignableFrom(error.getClass())) {
+      if (errorType.isAssignableFrom(error.getClass())) {
         return (Result<V, E>) f.apply((F) error);
       }
 
@@ -252,8 +252,8 @@ public interface Result<V, E> extends Iterable<V>, Serializable {
 
     @Override
     public <F extends E> Result<V, E> recover(
-        final Class<F> errorVype, final Function<F, ? extends V> f) {
-      return recoverWith(errorVype, e -> Result.success(f.apply(e)));
+        final Class<F> errorType, final Function<F, ? extends V> f) {
+      return recoverWith(errorType, e -> Result.success(f.apply(e)));
     }
 
     @Override
