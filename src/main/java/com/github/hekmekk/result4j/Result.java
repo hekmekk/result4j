@@ -49,6 +49,8 @@ public interface Result<V, E> extends Iterable<V>, Serializable {
 
   V orElse(Supplier<V> s);
 
+  V orElse(Function<E, V> f);
+
   V unsafeGet();
 
   E unsafeGetError();
@@ -133,6 +135,11 @@ public interface Result<V, E> extends Iterable<V>, Serializable {
 
     @Override
     public V orElse(final Supplier<V> s) {
+      return value;
+    }
+
+    @Override
+    public V orElse(final Function<E, V> f) {
       return value;
     }
 
@@ -266,6 +273,12 @@ public interface Result<V, E> extends Iterable<V>, Serializable {
     public V orElse(final Supplier<V> s) {
       Objects.requireNonNull(s, "s must not be null");
       return s.get();
+    }
+
+    @Override
+    public V orElse(final Function<E, V> f) {
+      Objects.requireNonNull(f, "s must not be null");
+      return f.apply(error);
     }
 
     @Override

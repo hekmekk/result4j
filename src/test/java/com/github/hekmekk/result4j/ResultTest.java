@@ -140,10 +140,15 @@ class ResultTest {
     assertThrows(
         NullPointerException.class,
         () -> Result.<Integer, Integer>failure(1).orElse((Supplier<Integer>) null));
+    assertThrows(
+        NullPointerException.class,
+        () -> Result.<Integer, Integer>failure(1).orElse((Function<Integer, Integer>) null));
     assertThat(Result.success(1).orElse(23), is(1));
     assertThat(Result.failure(1).orElse(23), is(23));
     assertThat(Result.success(1).orElse(() -> 23), is(1));
     assertThat(Result.failure(1).orElse(() -> 23), is(23));
+    assertThat(Result.success(1).orElse(i -> 23), is(1));
+    assertThat(Result.failure(1).orElse(i -> 23), is(23));
   }
 
   @Test
