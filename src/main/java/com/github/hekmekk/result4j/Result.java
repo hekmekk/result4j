@@ -12,58 +12,58 @@ import java.util.function.Supplier;
  * A container type with two possible cases: A {@link Result} is either a {@link Success} with a
  * value or a {@link Failure} with an error.
  *
- * @param <T> the type of success value
+ * @param <V> the type of success value
  * @param <E> the type of the failure error
  */
-public interface Result<T, E> extends Iterable<T>, Serializable {
+public interface Result<V, E> extends Iterable<V>, Serializable {
 
-  static <T, E> Result<T, E> success(T value) {
+  static <V, E> Result<V, E> success(V value) {
     return new Success<>(value);
   }
 
-  static <T, E> Result<T, E> failure(E error) {
+  static <V, E> Result<V, E> failure(E error) {
     return new Failure<>(error);
   }
 
-  <U> Result<U, E> flatMap(Function<? super T, ? extends Result<? extends U, E>> f);
+  <U> Result<U, E> flatMap(Function<? super V, ? extends Result<? extends U, E>> f);
 
-  <U> Result<U, E> map(Function<? super T, ? extends U> f);
+  <U> Result<U, E> map(Function<? super V, ? extends U> f);
 
-  <F extends E> Result<T, E> recoverWith(Function<F, ? extends Result<? extends T, E>> f);
+  <F extends E> Result<V, E> recoverWith(Function<F, ? extends Result<? extends V, E>> f);
 
-  <F extends E> Result<T, E> recoverWith(
-      Class<F> errorType, Function<F, ? extends Result<? extends T, E>> f);
+  <F extends E> Result<V, E> recoverWith(
+      Class<F> errorVype, Function<F, ? extends Result<? extends V, E>> f);
 
-  <F extends E> Result<T, E> recover(Function<F, ? extends T> f);
+  <F extends E> Result<V, E> recover(Function<F, ? extends V> f);
 
-  <F extends E> Result<T, E> recover(Class<F> errorType, Function<F, ? extends T> f);
+  <F extends E> Result<V, E> recover(Class<F> errorVype, Function<F, ? extends V> f);
 
-  <U> U fold(Function<? super T, ? extends U> f, Function<? super E, ? extends U> g);
+  <U> U fold(Function<? super V, ? extends U> f, Function<? super E, ? extends U> g);
 
-  default <U> U transform(Function<? super Result<T, E>, ? extends U> f) {
+  default <U> U transform(Function<? super Result<V, E>, ? extends U> f) {
     Objects.requireNonNull(f, "f must not be null");
     return f.apply(this);
   }
 
-  T orElse(T other);
+  V orElse(V other);
 
-  T orElse(Supplier<T> s);
+  V orElse(Supplier<V> s);
 
-  T unsafeGet();
+  V unsafeGet();
 
   E unsafeGetError();
 
-  Result<T, E> onSuccess(final Consumer<T> c);
+  Result<V, E> onSuccess(final Consumer<V> c);
 
-  Result<T, E> onFailure(final Consumer<E> c);
+  Result<V, E> onFailure(final Consumer<E> c);
 
-  final class Success<T, E> implements Result<T, E> {
+  final class Success<V, E> implements Result<V, E> {
 
     private static final long serialVersionUID = 1L;
 
-    private final T value;
+    private final V value;
 
-    private Success(final T value) {
+    private Success(final V value) {
       Objects.requireNonNull(value, "value must not be null");
       this.value = value;
     }
@@ -86,58 +86,58 @@ public interface Result<T, E> extends Iterable<T>, Serializable {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <U> Result<U, E> flatMap(final Function<? super T, ? extends Result<? extends U, E>> f) {
+    public <U> Result<U, E> flatMap(final Function<? super V, ? extends Result<? extends U, E>> f) {
       Objects.requireNonNull(f, "f must not be null");
       return (Result<U, E>) f.apply(value);
     }
 
     @Override
-    public <U> Result<U, E> map(final Function<? super T, ? extends U> f) {
+    public <U> Result<U, E> map(final Function<? super V, ? extends U> f) {
       return flatMap(v -> Result.success(f.apply(v)));
     }
 
     @Override
-    public <F extends E> Result<T, E> recoverWith(
-        final Function<F, ? extends Result<? extends T, E>> f) {
+    public <F extends E> Result<V, E> recoverWith(
+        final Function<F, ? extends Result<? extends V, E>> f) {
       return this;
     }
 
     @Override
-    public <F extends E> Result<T, E> recoverWith(
-        final Class<F> errorType, final Function<F, ? extends Result<? extends T, E>> f) {
+    public <F extends E> Result<V, E> recoverWith(
+        final Class<F> errorVype, final Function<F, ? extends Result<? extends V, E>> f) {
       return this;
     }
 
     @Override
-    public <F extends E> Result<T, E> recover(final Function<F, ? extends T> f) {
+    public <F extends E> Result<V, E> recover(final Function<F, ? extends V> f) {
       return this;
     }
 
     @Override
-    public <F extends E> Result<T, E> recover(
-        final Class<F> errorType, final Function<F, ? extends T> f) {
+    public <F extends E> Result<V, E> recover(
+        final Class<F> errorVype, final Function<F, ? extends V> f) {
       return this;
     }
 
     @Override
     public <U> U fold(
-        final Function<? super T, ? extends U> f, final Function<? super E, ? extends U> g) {
+        final Function<? super V, ? extends U> f, final Function<? super E, ? extends U> g) {
       Objects.requireNonNull(f, "f must not be null");
       return f.apply(value);
     }
 
     @Override
-    public T orElse(final T other) {
+    public V orElse(final V other) {
       return value;
     }
 
     @Override
-    public T orElse(final Supplier<T> s) {
+    public V orElse(final Supplier<V> s) {
       return value;
     }
 
     @Override
-    public T unsafeGet() {
+    public V unsafeGet() {
       return value;
     }
 
@@ -147,20 +147,20 @@ public interface Result<T, E> extends Iterable<T>, Serializable {
     }
 
     @Override
-    public Result<T, E> onSuccess(final Consumer<T> c) {
+    public Result<V, E> onSuccess(final Consumer<V> c) {
       Objects.requireNonNull(c, "c must not be null");
       c.accept(value);
       return this;
     }
 
     @Override
-    public Result<T, E> onFailure(final Consumer<E> c) {
+    public Result<V, E> onFailure(final Consumer<E> c) {
       return this;
     }
 
     @Override
-    public Iterator<T> iterator() {
-      return new Iterator<T>() {
+    public Iterator<V> iterator() {
+      return new Iterator<V>() {
         private boolean more = true;
 
         @Override
@@ -169,7 +169,7 @@ public interface Result<T, E> extends Iterable<T>, Serializable {
         }
 
         @Override
-        public T next() {
+        public V next() {
           more = false;
           return value;
         }
@@ -177,7 +177,7 @@ public interface Result<T, E> extends Iterable<T>, Serializable {
     }
   }
 
-  final class Failure<T, E> implements Result<T, E> {
+  final class Failure<V, E> implements Result<V, E> {
 
     private static final long serialVersionUID = 1L;
 
@@ -206,32 +206,32 @@ public interface Result<T, E> extends Iterable<T>, Serializable {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <U> Result<U, E> flatMap(final Function<? super T, ? extends Result<? extends U, E>> f) {
+    public <U> Result<U, E> flatMap(final Function<? super V, ? extends Result<? extends U, E>> f) {
       return (Result<U, E>) this;
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public <U> Result<U, E> map(final Function<? super T, ? extends U> f) {
+    public <U> Result<U, E> map(final Function<? super V, ? extends U> f) {
       return (Result<U, E>) this;
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public <F extends E> Result<T, E> recoverWith(
-        final Function<F, ? extends Result<? extends T, E>> f) {
+    public <F extends E> Result<V, E> recoverWith(
+        final Function<F, ? extends Result<? extends V, E>> f) {
       Objects.requireNonNull(f, "f must not be null");
-      return (Result<T, E>) f.apply((F) error);
+      return (Result<V, E>) f.apply((F) error);
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public <F extends E> Result<T, E> recoverWith(
-        final Class<F> errorType, final Function<F, ? extends Result<? extends T, E>> f) {
-      Objects.requireNonNull(errorType, "errorClazz must not be null");
+    public <F extends E> Result<V, E> recoverWith(
+        final Class<F> errorVype, final Function<F, ? extends Result<? extends V, E>> f) {
+      Objects.requireNonNull(errorVype, "errorClazz must not be null");
       Objects.requireNonNull(f, "f must not be null");
-      if (errorType.isAssignableFrom(error.getClass())) {
-        return (Result<T, E>) f.apply((F) error);
+      if (errorVype.isAssignableFrom(error.getClass())) {
+        return (Result<V, E>) f.apply((F) error);
       }
 
       return this;
@@ -239,37 +239,37 @@ public interface Result<T, E> extends Iterable<T>, Serializable {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <F extends E> Result<T, E> recover(final Function<F, ? extends T> f) {
+    public <F extends E> Result<V, E> recover(final Function<F, ? extends V> f) {
       return recoverWith(e -> Result.success(f.apply((F) e)));
     }
 
     @Override
-    public <F extends E> Result<T, E> recover(
-        final Class<F> errorType, final Function<F, ? extends T> f) {
-      return recoverWith(errorType, e -> Result.success(f.apply(e)));
+    public <F extends E> Result<V, E> recover(
+        final Class<F> errorVype, final Function<F, ? extends V> f) {
+      return recoverWith(errorVype, e -> Result.success(f.apply(e)));
     }
 
     @Override
     public <U> U fold(
-        final Function<? super T, ? extends U> f, final Function<? super E, ? extends U> g) {
+        final Function<? super V, ? extends U> f, final Function<? super E, ? extends U> g) {
       Objects.requireNonNull(g, "g must not be null");
       return g.apply(error);
     }
 
     @Override
-    public T orElse(final T other) {
+    public V orElse(final V other) {
       Objects.requireNonNull(other, "other must not be null");
       return other;
     }
 
     @Override
-    public T orElse(final Supplier<T> s) {
+    public V orElse(final Supplier<V> s) {
       Objects.requireNonNull(s, "s must not be null");
       return s.get();
     }
 
     @Override
-    public T unsafeGet() {
+    public V unsafeGet() {
       throw new NoSuchElementException("unsafeGet() on Failure");
     }
 
@@ -279,20 +279,20 @@ public interface Result<T, E> extends Iterable<T>, Serializable {
     }
 
     @Override
-    public Result<T, E> onSuccess(final Consumer<T> c) {
+    public Result<V, E> onSuccess(final Consumer<V> c) {
       return this;
     }
 
     @Override
-    public Result<T, E> onFailure(final Consumer<E> c) {
+    public Result<V, E> onFailure(final Consumer<E> c) {
       Objects.requireNonNull(c, "c must not be null");
       c.accept(error);
       return this;
     }
 
     @Override
-    public Iterator<T> iterator() {
-      return new Iterator<T>() {
+    public Iterator<V> iterator() {
+      return new Iterator<V>() {
 
         @Override
         public boolean hasNext() {
@@ -300,7 +300,7 @@ public interface Result<T, E> extends Iterable<T>, Serializable {
         }
 
         @Override
-        public T next() {
+        public V next() {
           return null;
         }
       };
