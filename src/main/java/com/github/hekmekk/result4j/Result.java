@@ -17,6 +17,14 @@ import java.util.function.Supplier;
  */
 public interface Result<V, E> extends Iterable<V>, Serializable {
 
+  static <V> Result<V, Throwable> of(CheckedSupplier<V> s) {
+    try {
+      return success(s.get());
+    } catch (Throwable t) {
+      return failure(t);
+    }
+  }
+
   static <V, E> Result<V, E> success(V value) {
     return new Success<>(value);
   }

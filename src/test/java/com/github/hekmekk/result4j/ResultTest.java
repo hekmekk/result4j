@@ -22,6 +22,26 @@ import org.junit.jupiter.api.Test;
 class ResultTest {
 
   @Test
+  void of() {
+    assertThat(Result.of(() -> "SUCCESS"), instanceOf(Result.Success.class));
+    assertThat(
+        Result.of(
+                () -> {
+                  throw new Exception("FAILURE");
+                })
+            .unsafeGetError(),
+        instanceOf(Exception.class));
+
+    assertThat(
+        Result.of(
+                () -> {
+                  throw new RuntimeException("FAILURE");
+                })
+            .unsafeGetError(),
+        instanceOf(RuntimeException.class));
+  }
+
+  @Test
   @SuppressWarnings("ResultOfMethodCallIgnored")
   void success() {
     assertThrows(NullPointerException.class, () -> Result.success(null));
