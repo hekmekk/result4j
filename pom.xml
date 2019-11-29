@@ -139,7 +139,7 @@
               </execution>
             </executions>
             <groupId>com.cosium.code</groupId>
-            <version>1.24</version>
+            <version>1.38</version>
           </plugin>
         </plugins>
       </build>
